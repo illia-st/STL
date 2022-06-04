@@ -1,16 +1,10 @@
-﻿#include <iostream>
-#include <memory>
+﻿#include "List.h"
 #include "Vector.h"
-
 
 int main()
 {
-	Vector<int> arr{1,2,3,4,5};
-	
-	for (int & it : arr) {
-		std::cout << it << std::endl;
-	}
-
+	Vector<int> v = {1,2,3,4,5};
+    List<int> l;
 
 	return 0;
 }
