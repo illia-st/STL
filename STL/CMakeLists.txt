@@ -6,7 +6,9 @@ cmake_minimum_required (VERSION 3.8)
 set (TARGET_NAME STL)
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (${TARGET_NAME} "main.cpp" "Vector.h")
+add_executable (${TARGET_NAME} "main.cpp"
+								"Vector.h"
+								"VectorIterator.h")
 
 
 set_target_properties( ${TARGET_NAME} PROPERTIES OUTPUT_NAME_DEBUG ${TARGET_NAME}-debug )

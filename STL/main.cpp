@@ -1,17 +1,16 @@
 ﻿#include <iostream>
 #include <memory>
+#include "Vector.h"
 
 
 int main()
 {
-	auto ptr = std::make_unique<int[]>(10);
-
-	int* raw_ptr = &ptr[0];
-
-	for (size_t i = 0; i < 10; ++i) {
-		raw_ptr[i] = i;
-		std::cout << raw_ptr[i] << " ";
+	Vector<int> arr{1,2,3,4,5};
+	
+	for (int & it : arr) {
+		std::cout << it << std::endl;
 	}
-	std::cout << ptr.get()[2] << std::endl;
+
+
 	return 0;
 }
