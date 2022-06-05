@@ -364,4 +364,4 @@ FodyWeavers.xsd
 /.idea/
 /STL/.idea/
 /STL/cmake-build-debug/
-/STL/STL/cmake-build-debug/
+/STL/main.cpp
