@@ -8,7 +8,7 @@ set (TARGET_NAME STL)
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (${TARGET_NAME} "main.cpp"
 								"Vector.h"
-								"VectorIterator.h" List.h)
+								"VectorIterator.h" List.h Abstract_List.h)
 
 
 set_target_properties( ${TARGET_NAME} PROPERTIES OUTPUT_NAME_DEBUG ${TARGET_NAME}-debug )

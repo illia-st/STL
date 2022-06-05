@@ -1,10 +1,15 @@
-﻿#include "List.h"
+﻿#include <iostream>
+#include <list>
+#include "List.h"
 #include "Vector.h"
+
 
 int main()
 {
-	Vector<int> v = {1,2,3,4,5};
-    List<int> l;
-
+    List<int> l {1,2,3,4,5};
+    for(size_t i{}; i < l.Size(); ++i){
+        std::cout << l[i] << " ";
+    }
+    std::cout << std::endl;
 	return 0;
 }

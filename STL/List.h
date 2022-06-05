@@ -2,40 +2,50 @@
 #include <cstddef>
 #include <initializer_list>
 #include <algorithm>
+#include <stdexcept>
+#include "Abstract_List.h"
 
-template<class Type>
-struct ListNode{
-    Type* next;
-    Type* prev;
-    Type val;
-    ListNode(): next(nullptr), prev(nullptr), val(){}
-    explicit ListNode(Type val_): next(nullptr), prev(nullptr), val(val_){}
-    ListNode(Type* next, Type* prev, Type val_): next(next), prev(prev), val(val_) {}
-};
 
 template <class T>
-class List{
+class List: public Abstract_List<T>{
 private:
-    ListNode<T>* head = nullptr;
-    ListNode<T>* end = nullptr;
+    struct ListNode{
+        ListNode* next;
+        ListNode* prev;
+        T val;
+        ListNode(): next(nullptr), prev(nullptr), val(){}
+        explicit ListNode(T val_): next(nullptr), prev(nullptr), val(val_){}
+        ListNode(ListNode* next, ListNode* prev, T val_): next(next), prev(prev), val(val_) {}
+        T& operator ++(){prev = prev->next; next = next->next; val = prev->next->val; return val;}
+        T& operator --(){prev = prev->prev; next = next->prev; val = prev->next->val; return val;}
+        T operator ++(int){const T t = next->prev->val; prev = prev->next; next = next->next; val = prev->next->val; return t;}
+        T operator --(int){const T t = next->prev->val; prev = prev->prev; next = next->prev; val = prev->next->val; return t;}
+    };
+protected:
+    ListNode* head = nullptr;
+    ListNode* end = nullptr;
     size_t size = 0;
 public:
     List();
     virtual ~List();
     List(const List<T>& copy);
     List(List<T>&& moved) noexcept;
-    List(const std::initializer_list<T> &elements);
+    List(std::initializer_list<T> elements);
     List<T>& operator = (const List<T>& copy);
     List<T>& operator = (List<T>&& moved) noexcept;
-    List<T>& operator = (const std::initializer_list<T>& elements);
-    void Push_Back(const T& element);
-    void Push_Back(T&& element);
-    void Push_Front(const T& element);
-    void Push_Front(T&& element);
-    void Pop_Back();
-    void Pop_Front();
-    [[nodiscard]] size_t Size() const;
-    [[nodiscard]] bool Empty() const;
+    List<T>& operator = (std::initializer_list<T> elements);
+    T& operator [](size_t index) override;
+    T operator [](size_t index) const override;
+    void Push_Back(const T& element) override;
+    void Push_Back(T&& element) override;
+    void Push_Front(const T& element) override;
+    void Push_Front(T&& element) override;
+    void Pop_Back() override;
+    void Pop_Front() override;
+    void Insert(size_t index, const T& value) override;
+    [[nodiscard]] size_t Size() const override;
+    [[nodiscard]] bool Empty() const override;
+    void clear() override;
 };
 // zero parameters constructor
 template<class T>
@@ -43,28 +53,18 @@ List<T>::List() = default;
 
 template<class T>
 List<T>::~List() {
-    if(this->size > 1) {
-        while (head->next != end) {
-            ListNode<T> temp = head;
-            head = head->next;
-            delete temp;
-        }
-    }
-    delete end;
-    delete head;
-    this->size = 0;
+    this->clear();
 }
 
 template<class T>
 List<T>& List<T>::operator = (const List<T> &copy) {
-    if(this != nullptr){
-        this->~List();// actually I could make more complex implementation but I decided to make it easier
+    if(size > 0){// it would be better to add method clear and use it here and in the destructor
+        this->clear();
     }
-    ListNode<T>* t = copy.head;
+    ListNode* t = copy.head;
     // at the end of loop t = copy.end
     while(t != copy.end){
-        T value = t->val;
-        this->Push_Back(value);
+        this->Push_Back(t->val);
         t = t->next;
     }
     this->Push_Back(t->val);
@@ -78,8 +78,8 @@ List<T>::List(const List<T> &copy) {
 
 template<class T>
 List<T>& List<T>::operator = (List<T> &&moved) noexcept {
-    if(this != nullptr){
-        this->~List();
+    if(size > 0){
+        this->clear();
     }
     this->head = moved.head;
     this->end = moved.end;
@@ -96,26 +96,20 @@ List<T>::List(List<T> &&moved) noexcept{
 }
 
 template<class T>
-List<T>& List<T>::operator = (const std::initializer_list<T>& elements) {
-    if(this != nullptr){
-        this->~List();
+List<T>& List<T>::operator = (std::initializer_list<T> elements) {
+    if(size > 0){
+        this->clear();
     }
-    head = new ListNode<T>();
-    end = new ListNode<T>();
-    head->next = end;
-    head->prev = end;
-    end->next = head;
-    end->prev = head;
-    size = 0;
+    //this->Push_Back(1);
     for(const auto& el: elements){
+        //when size = 1 head = end head->next == end->next = nullptr
         this->Push_Back(el);
     }
-    //no need to initialize this->size because push_back increments it after each adding
     return *this;
 }
 
 template<class T>
-List<T>::List(const std::initializer_list<T> &elements) {
+List<T>::List(std::initializer_list<T> elements) {
     *this = elements;
 }
 
@@ -126,8 +120,7 @@ size_t List<T>::Size() const {
 
 template<class T>
 void List<T>::Push_Back(const T &element) {
-    //if out list is empty
-    if(head == nullptr){
+    if(size == 0){
         head = new ListNode(element);
         end = head;
     }
@@ -141,13 +134,14 @@ void List<T>::Push_Back(const T &element) {
     else{
         end->next = new ListNode(head, end, element);
         end = end->next;
+        head->prev = end;
     }
     ++size;
 }
 
 template<class T>
 void List<T>::Push_Back(T &&element) {
-    this->Push_Back(std::move(element));
+    this->Push_Back(element);
 }
 
 template<class T>
@@ -160,6 +154,7 @@ void List<T>::Push_Front(const T &element) {
     //size > 0
     else {
         end->next = new ListNode(head, end, element);
+        head->prev = end->next;
         head = end->next;
     }
     ++size;
@@ -167,26 +162,29 @@ void List<T>::Push_Front(const T &element) {
 
 template<class T>
 void List<T>::Push_Front(T &&element) {
-    this->Push_Front(std::move(element));
+    this->Push_Front(element);
 }
 
 template<class T>
 void List<T>::Pop_Back() {
-    //if it works correcntly, replace it by macro DELETER
+    //if it works correctly, replace it by macro DELETER
     if(size == 0){
         return;
     }
     if(size == 1){
         delete head;
-        delete end;
         size = 0;
         return;
     }
-    ListNode<T> * t = end;
+    ListNode * t = end;
     end = end->prev;
     end->next = t->next;
     delete t;
     --size;
+    if(size == 1){
+        head->next = head->prev = nullptr;
+        end = head;
+    }
 }
 
 template<class T>
@@ -196,20 +194,96 @@ void List<T>::Pop_Front() {
     }
     if(size == 1){
         delete head;
-        delete end;
         size = 0;
         return;
     }
-    ListNode<T> * t = head;
+    ListNode * t = head;
     head = head->next;
     head->prev = t->prev;
     delete t;
     --size;
+    if(size == 1){
+        head->next = head->prev = nullptr;
+        end = head;
+    }
 }
 
 template<class T>
 [[nodiscard]] bool List<T>::Empty() const {
     return size == 0;
+}
+template<class T>
+void List<T>::clear(){
+    while(this->size > 0){
+        this->Pop_Back();
+    }
+}
+
+template<class T>
+void List<T>::Insert(size_t index, const T &value) {
+    if(index >= this->size){
+        std::string error = "Your index is bigger that size. Line number " + std::to_string(__LINE__)
+                + " file " + __FILE__;
+        throw std::out_of_range(error);
+    }
+
+    //if direction == true we begin moving from the head
+    bool direction = (this->size/2 > index);
+    ListNode* t;
+    if(direction){
+        t = head;
+        size_t counter = 0;
+        while(counter != index){
+            t = t->next;
+            ++counter;
+        }
+    }
+    else{
+        t = end;
+        size_t counter = this->size - 1;
+        while(counter != index){
+            t = t->prev;
+            --counter;
+        }
+    }
+    //now t pointer is on the correct position
+    ListNode* p = t->prev;
+    p->next = new ListNode(t, p, value);
+}
+
+template<class T>
+T& List<T>::operator[](size_t index) {
+    if(index >= this->size){
+        std::string error = "Your index is bigger that size. Line number " + std::to_string(__LINE__)
+                            + " file " + __FILE__;
+        throw std::out_of_range(error);
+    }
+
+    //if direction == true we begin moving from the head
+    bool direction = (this->size/2 > index);
+    ListNode* t;
+    if(direction){
+        t = head;
+        size_t counter = 0;
+        while(counter != index){
+            ++t;
+            ++counter;
+        }
+    }
+    else{
+        t = end;
+        size_t counter = this->size - 1;
+        while(counter != index){
+            --t;
+            --counter;
+        }
+    }
+    return t->val;
+}
+
+template<class T>
+T List<T>::operator[](size_t index) const {
+    return const_cast<List<T>*>(this)->operator[](index);
 }
 
 
