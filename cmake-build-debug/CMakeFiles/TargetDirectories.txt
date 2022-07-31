@@ -1,0 +1,5 @@
+/home/illia_st/Programming/c++/STL/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/illia_st/Programming/c++/STL/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/illia_st/Programming/c++/STL/cmake-build-debug/STL/CMakeFiles/STL.dir
+/home/illia_st/Programming/c++/STL/cmake-build-debug/STL/CMakeFiles/edit_cache.dir
+/home/illia_st/Programming/c++/STL/cmake-build-debug/STL/CMakeFiles/rebuild_cache.dir
