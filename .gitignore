@@ -4,7 +4,6 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # User-specific files
-cmake-build-debug/
 *.rsuser
 *.suo
 *.user
@@ -18,7 +17,6 @@ cmake-build-debug/
 mono_crash.*
 
 # Build results
-/cmake-build-debug
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
