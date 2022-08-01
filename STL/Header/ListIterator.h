@@ -1,5 +1,6 @@
 #pragma once
 #include <iterator>
+#include "ListNode.h"
 
 template<typename BlDataType>
 class ListIterator{
@@ -7,7 +8,7 @@ private:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = BlDataType;
     using difference_type = std::ptrdiff_t;
-    using pointer = BlDataType*;
+    using pointer = ListNode<BlDataType>*;
     using reference = BlDataType&;
     using full_iterator_type = ListIterator<BlDataType>;
 public:
@@ -31,6 +32,9 @@ public:
     full_iterator_type& operator = (pointer ptr) noexcept{
         m_ptr = ptr;
         return *this;
+    }
+    full_iterator_type& operator ++ (){
+        if(m_ptr->)
     }
     
 protected:

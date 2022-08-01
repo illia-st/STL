@@ -1,6 +1,7 @@
 #pragma once
 template<typename T>
 struct ListNode{
+    //I have to make the listnode to know about those the last last element
     ListNode* next;
     ListNode* prev;
     T val;

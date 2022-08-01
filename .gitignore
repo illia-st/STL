@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /STL/.idea/
 /STL/cmake-build-debug/
 /STL/main.cpp
+/cmake-build-debug/
