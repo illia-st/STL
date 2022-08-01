@@ -11,10 +11,7 @@ class List: public Abstract_List<T>{
 private:
     ListNode<T>* head = nullptr;
     ListNode<T>* end = nullptr;
-    ListNode<T>* after_the_end {new ListNode<T>};
     size_t size = 0;
-protected:
-    void refresh_after_the_end();
 public:
     List();
     virtual ~List();
@@ -58,7 +55,6 @@ List<T>& List<T>::operator = (const List<T> &copy) {
         t = t->next;
     }
     this->Push_Back(t->val);
-    this->refresh_after_the_end();
     return *this;
 }
 
@@ -79,7 +75,6 @@ List<T>& List<T>::operator = (List<T> &&moved) noexcept {
     moved.end = nullptr;
     moved.size = 0;
 
-    this->refresh_after_the_end();
     return *this;
 }
 
@@ -98,8 +93,6 @@ List<T>& List<T>::operator = (std::initializer_list<T> elements) {
         //when size = 1 head = end head->next == end->next = nullptr
         this->Push_Back(el);
     }
-
-    this->refresh_after_the_end();
     return *this;
 }
 
@@ -121,18 +114,14 @@ void List<T>::Push_Back(const T &element) {
     }
     //if there is the only element in our list
     else if(head->next == nullptr){
-        end = new ListNode<T>(head, head, element);
+        end = new ListNode<T>(nullptr, head, element);
         head->next = end;
-        head->prev = end;
     }
     //if our size is > 1
     else{
-        end->next = new ListNode(head, end, element);
+        end->next = new ListNode<T>(nullptr, end, element);
         end = end->next;
-        head->prev = end;
     }
-
-    this->refresh_after_the_end();
     ++size;
 }
 
@@ -150,12 +139,9 @@ void List<T>::Push_Front(const T &element) {
     }
     //size > 0
     else {
-        end->next = new ListNode<T>(head, end, element);
-        head->prev = end->next;
-        head = end->next;
+        head->prev = new ListNode<T>(head, nullptr, element);
+        head = head->prev;
     }
-
-    this->refresh_after_the_end();
     ++size;
 }
 
@@ -168,55 +154,42 @@ template<class T>
 void List<T>::Pop_Back() {
     //if it works correctly, replace it by macro DELETER
     if(size == 0){
-        this->refresh_after_the_end();
         return;
     }
     if(size == 1){
         delete head;
         size = 0;
         head = end = nullptr;
-        this->refresh_after_the_end();
         return;
     }
     ListNode<T> * t = end;
     end = end->prev;
-    end->next = t->next;
+    end->next = nullptr;
     delete t;
     --size;
-    if(size == 1){
-        head->next = head->prev = nullptr;
-        end = head;
-    }
+//    if(size == 1){
+//        head->next = head->prev = nullptr;
+//        end = head;
+//    }
 
-    this->refresh_after_the_end();
 }
 
 template<class T>
 void List<T>::Pop_Front() {
     if(size == 0){
-
-        this->refresh_after_the_end();
         return;
     }
     if(size == 1){
         delete head;
         head = end = nullptr;
         size = 0;
-
-        this->refresh_after_the_end();
         return;
     }
     ListNode<T> * t = head;
     head = head->next;
-    head->prev = t->prev;
+    head->prev = nullptr;
     delete t;
     --size;
-    if(size == 1){
-        head->next = head->prev = nullptr;
-        end = head;
-    }
-
-    this->refresh_after_the_end();
 }
 
 template<class T>
@@ -229,7 +202,6 @@ void List<T>::clear(){
         this->Pop_Back();
     }
 
-    this->refresh_after_the_end();
 }
 
 template<class T>
@@ -268,7 +240,6 @@ void List<T>::Insert(size_t index, const T &value) {
     t->prev = p->next;
     ++size;
 
-    this->refresh_after_the_end();
 }
 
 template<class T>
@@ -299,7 +270,6 @@ T& List<T>::operator[](size_t index) {
         }
     }
 
-    this->refresh_after_the_end();
     return t->val;
 }
 
@@ -308,10 +278,5 @@ T List<T>::operator[](size_t index) const {
     return const_cast<List<T>*>(this)->operator[](index);
 }
 
-template<class T>
-void List<T>::refresh_after_the_end() {
-    after_the_end->prev = end;
-    after_the_end->next = head;
-}
 
 

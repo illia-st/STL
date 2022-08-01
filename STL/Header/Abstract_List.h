@@ -14,7 +14,7 @@ public:
     virtual void Insert(size_t index, const T& value) = 0;
     [[nodiscard]] virtual  size_t Size() const = 0;
     [[nodiscard]] virtual bool Empty() const = 0;
-    [[nodiscard]] virtual void clear() = 0;
+    virtual void clear() = 0;
     virtual T& operator [](size_t index) = 0;
     virtual T operator [](size_t index) const = 0;
 };
