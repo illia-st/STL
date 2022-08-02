@@ -15,7 +15,6 @@ private:
     using reference = ListNode<BlDataType>&;
     using full_iterator_type = ListIterator<BlDataType>;
     using const_full_iterator_type = const ListIterator<BlDataType>;
-
 public:
     explicit ListIterator(pointer ptr = nullptr): m_ptr{ptr}{}
     ListIterator(const full_iterator_type & iterator){
@@ -38,8 +37,9 @@ public:
         m_ptr = ptr;
         return *this;
     }
-    bool operator == (const_full_iterator_type& rhs) const {return this->m_ptr == rhs.getConstPtr();}
-    bool operator != (const_full_iterator_type& rhs) const {return this->m_ptr != rhs.getConstPtr();}
+    bool operator == (const_full_iterator_type& rhs) const {return this->m_ptr == rhs.m_ptr;}
+    bool operator != (const_full_iterator_type& rhs) const {return this->m_ptr != rhs.m_ptr;}
+    bool operator < (const_full_iterator_type& rhs) const {return this->m_ptr->val < rhs.m_ptr->val;}
     full_iterator_type& operator++ (){
         if(m_ptr == nullptr){
             std::string error{"Your iterator is out of range, please check your code at line " +
@@ -94,11 +94,12 @@ public:
         }
         return m_ptr->val;
     }
-    const_pointer operator -> () const{
-        return m_ptr;
+    const SharedListNode<BlDataType>* operator -> () const{
+        return new SharedListNode<BlDataType>*(m_ptr);
     }
-    pointer getPtr() const { return m_ptr; }
-    const_pointer getConstPtr() const { return m_ptr; }
+    SharedListNode<BlDataType>* getPtr() const { return new SharedListNode<BlDataType>*(m_ptr);}
+    const SharedListNode<BlDataType>* getConstPtr() const { return new SharedListNode<BlDataType>*(m_ptr); }
+
 
 
 protected:
