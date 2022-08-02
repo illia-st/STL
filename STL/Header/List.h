@@ -68,10 +68,10 @@ List<T>& List<T>::operator = (const List<T> &copy) {
     ListNode<T>* t = copy.head;
     // at the tail of loop t = copy.tail
     while(t != copy.tail){
-        this->Push_Back(GetValue(t));
-        MoveNext(t);
+        this->Push_Back(t->val);
+        t = t->next;
     }
-    this->Push_Back(GetValue(t));
+    this->Push_Back(t->val);
     return *this;
 }
 
@@ -132,12 +132,12 @@ void List<T>::Push_Back(const T &element) {
     //if there is the only element in our list
     else if(head->next == nullptr){
         tail = new ListNode<T>(nullptr, head, element);
-        GetNext(head) = tail;
+        head->next = tail;
     }
     //if our size is > 1
     else{
-        GetNext(tail) = new ListNode<T>(nullptr, tail, element);
-        MoveNext(tail);
+        tail->next = new ListNode<T>(nullptr, tail, element);
+        tail = tail->next;
     }
     ++size;
 }
@@ -156,8 +156,8 @@ void List<T>::Push_Front(const T &element) {
     }
     //size > 0
     else {
-        GetPrev(head) = new ListNode<T>(head, nullptr, element);
-        MovePrev(head);
+        head->prev = new ListNode<T>(head, nullptr, element);
+        head = head->prev;
     }
     ++size;
 }
@@ -180,15 +180,10 @@ void List<T>::Pop_Back() {
         return;
     }
     ListNode<T> * t = tail;
-    MovePrev(tail);
-    GetNext(tail) = nullptr;
+    tail = tail->prev;
+    tail->next = nullptr;
     delete t;
     --size;
-//    if(size == 1){
-//        head->next = head->prev = nullptr;
-//        tail = head;
-//    }
-
 }
 
 template<class T>
@@ -203,8 +198,8 @@ void List<T>::Pop_Front() {
         return;
     }
     ListNode<T> * t = head;
-    MoveNext(head);
-    GetPrev(head) = nullptr;
+    head = head->next;
+    head->prev = nullptr;
     delete t;
     --size;
 }
@@ -239,7 +234,7 @@ void List<T>::Insert(size_t index, const T &value) {
         t = head;
         size_t counter = 0;
         while(counter != index){
-            MoveNext(t);
+            t = t->next;
             ++counter;
         }
     }
@@ -247,14 +242,14 @@ void List<T>::Insert(size_t index, const T &value) {
         t = tail;
         size_t counter = this->size - 1;
         while(counter != index){
-            MovePrev(t);
+            t = t->prev;
             --counter;
         }
     }
     //now t pointer is on the correct position
-    ListNode<T>* p = GetPrev(t);
-    GetNext(p) = new ListNode<T>(t, p, value);
-    GetPrev(t) = GetNext(p);
+    ListNode<T>* p = t->prev;
+    p->next = new ListNode<T>(t, p, value);
+    t->prev = p->next;
     ++size;
 
 }
@@ -274,7 +269,7 @@ T& List<T>::operator[](size_t index) {
         t = head;
         size_t counter = 0;
         while(counter != index){
-            MoveNext(t);
+            t->next;
             ++counter;
         }
     }
@@ -282,12 +277,12 @@ T& List<T>::operator[](size_t index) {
         t = tail;
         size_t counter = this->size - 1;
         while(counter != index){
-            MovePrev(t);
+            t = t->prev;
             --counter;
         }
     }
 
-    return GetValue(t);
+    return t->val;
 }
 
 template<class T>
@@ -295,17 +290,4 @@ T List<T>::operator[](size_t index) const {
     return const_cast<List<T>*>(this)->operator[](index);
 }
 
-//namespace {
-//    template<typename J>
-//    void MoveNext(ListNode<J>*& ptr) {ptr = ptr->next;}
-//
-//    template<typename J>
-//    void MovePrev(ListNode<J>*& ptr) {ptr = ptr->prev;}
-//
-//    template<typename J>
-//    J GetValue(const ListNode<J>* ptr)  {return ptr->val; }
-//
-//    template<typename J>
-//    J& GetValue(ListNode<J>* ptr) {return ptr->val;}
-//}
 

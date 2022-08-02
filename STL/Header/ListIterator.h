@@ -46,8 +46,7 @@ public:
                               std::to_string(__LINE__) + ", file " + __FILE__};
             throw std::out_of_range(error);
         }
-//        m_ptr = m_ptr->next;
-        MoveNext(m_ptr);
+        m_ptr = m_ptr->next;
         return (*this);
     }
     full_iterator_type operator ++(int) {
@@ -57,8 +56,7 @@ public:
             throw std::out_of_range(error);
         }
         auto temp(*this);
-        MoveNext(m_ptr);
-        //m_ptr = m_ptr->next;
+        m_ptr = m_ptr->next;
         return temp;
     }
     full_iterator_type& operator --(){
@@ -67,8 +65,7 @@ public:
                               std::to_string(__LINE__) + ", file " + __FILE__};
             throw std::out_of_range(error);
         };
-//        m_ptr = m_ptr->prev;
-        MovePrev(m_ptr);
+        m_ptr = m_ptr->prev;
         return *this;
     }
     full_iterator_type operator --(int){
@@ -78,8 +75,7 @@ public:
             throw std::out_of_range(error);
         }
         auto temp(*this);
-//        m_ptr = m_ptr->prev;
-        MovePrev(m_ptr);
+        m_ptr = m_ptr->prev;
         return temp;
     }
     value_type& operator *(){
@@ -88,7 +84,7 @@ public:
                               std::to_string(__LINE__) + ", file " + __FILE__};
             throw std::out_of_range(error);
         }
-        return GetValue(m_ptr);
+        return m_ptr->val;
     }
     const_value_type& operator *() const{
         if(m_ptr == nullptr){
@@ -96,7 +92,7 @@ public:
                               std::to_string(__LINE__) + ", file " + __FILE__};
             throw std::out_of_range(error);
         }
-        return GetValue(m_ptr);
+        return m_ptr->val;
     }
     const_pointer operator -> () const{
         return m_ptr;
